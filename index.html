@@ -40,7 +40,7 @@
                 },
                 error: function(err) {
                     let e = '<div style="background-color:red;"><strong> Something went wrong! Chuck Norris is not pleased.. We encountered the following error:<p>' + err.error + '</p></strong></div>'
-                    $('#joke-result').append(e);
+                    $('#joke-result').html(e);
                 }
             });
         };
