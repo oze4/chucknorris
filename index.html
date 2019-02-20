@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Chucky Norris</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="16x16" href="">
+</head>
+
+<body>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+
+
+    <div>
+        <button id='get-joke'>Click me for a Chuck Norris joke</button>
+    </div>
+    <div>
+        <p id='joke-result'></p>
+    </div>
+
+
+    <script type='text/javascript'>
+        $('#get-joke').on('click', function(){
+            getJoke();
+        });
+
+        function getJoke() {
+            $.ajax('https://api.chucknorris.io/jokes/random', {
+                method: "GET",
+                beforeSend: function() {
+                    $('#joke-result').html('Loading...');
+                },
+                success: function(result) {
+                    $('#joke-result').html('<strong>'+ result['value'] + '</strong>');
+                },
+                error: function(err) {
+                    let e = '<div style="background-color:red;"><strong> Something went wrong! Chuck Norris is not pleased.. We encountered the following error:<p>' + err.error + '</p></strong></div>'
+                    $('#joke-result').append(e);
+                }
+            });
+        };
+    </script>
+
+</body>
+
+</html>
