@@ -8,44 +8,111 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" sizes="16x16" href="">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
 
 <body>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
 
-
-    <div>
-        <button id='get-joke'>Click me for a Chuck Norris joke</button>
-    </div>
-    <div>
-        <p id='joke-result'></p>
+    <div class='container' style='margin-top:40px'>
+        <div class="card">
+            <div class='card-header'>
+                <h5 class='card-title'>Chucky Norris Jokes</h5>
+            </div>
+            <div class="card-body">
+                <div class='row card-top-row'>
+                    <div class='col-md-12'>
+                        <label for="category_dropdown">Select Category</label>
+                        <div>
+                            <select name="category_dropdown" id="category-dropdown"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class='row' style="margin-top:10px;">
+                    <div class='col-md-12'>
+                        <p class='card-text' style='height:300px;' id='joke-result'></p>
+                    </div>
+                </div>
+            </div>
+            <div class='card-footer'>
+                <button class='btn btn-primary float-right' type="button" id='get-joke'>Click me for a Chuck Norris joke</button>
+            </div>
+        </div>
     </div>
 
 
     <script type='text/javascript'>
-        $('#get-joke').on('click', function(){
-            getJoke();
-        });
-
-        function getJoke() {
-            $.ajax('https://api.chucknorris.io/jokes/random', {
-                method: "GET",
-                beforeSend: function() {
-                    $('#joke-result').html('Loading...');
+        $(document).ready(function () {
+            $.fn.extend({
+                getCategories: function () {
+                    $.ajax('https://api.chucknorris.io/jokes/categories', {
+                        method: 'GET',
+                        success: (result) => {                            
+                            result.push('random'); // append 'random' selection                            
+                            result.sort(); // sort alphabetically
+                            $.each(result, (index, item) => {
+                                $(this).append($('<option></option>').val(item).html(item));
+                            })
+                        },
+                    });
+                    return this;
                 },
-                success: function(result) {
-                    $('#joke-result').html('<strong>'+ result['value'] + '</strong>');
-                },
-                error: function(err) {
-                    let e = '<div style="background-color:red;"><strong> Something went wrong! Chuck Norris is not pleased.. We encountered the following error:<p>' + err.error + '</p></strong></div>'
-                    $('#joke-result').html(e);
+                getJoke: function (category) {
+                    let url = 'https://api.chucknorris.io/jokes/random';
+                    if(category !== undefined && category !== 'random'){
+                        url = url+'?category='+category;
+                    }
+                    $.ajax(url, {
+                        context: this,
+                        method: "GET",
+                        beforeSend: function () {
+                            this.html('Loading...');
+                        },
+                        success: function (result) {
+                            this.html('<strong>' + result['value'] + '</strong>');
+                        },
+                        error: function (err) {
+                            let e =
+                                '<div style="background-color:red;"><strong> Something went wrong! Chuck Norris is not pleased.. We encountered the following error:<p>' +
+                                err.error + '</p></strong></div>'
+                            this.html(e);
+                        }
+                    });
+                    return this;
                 }
             });
-        };
-    </script>
 
+            $('#category-dropdown').selectmenu({
+                disabled: false
+            }).getCategories();
+
+
+            $('#get-joke').on('click', function () {
+                let selectedCategory = $('#category-dropdown').val();
+                $('#joke-result').getJoke(selectedCategory);
+            });
+        })
+    </script>
+    <style>
+        /** 
+         * for future use
+        button[disabled] {
+            cursor: not-allowed;
+        }
+        **/
+
+        .card-top-row {
+            margin-bottom: 10px;
+        }
+    </style>
 </body>
 
 </html>
