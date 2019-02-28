@@ -55,62 +55,63 @@
 
 
     <script type='text/javascript'>
-        $(document).ready(function () {
-            $.fn.extend({
-                getCategories: function (callback) {
-                    return $.ajax('https://api.chucknorris.io/jokes/categories', {
-                        method: 'GET',
-                        success: (result) => {
-                            $('<option></option>').val(undefined).html("-").appendTo(this); // add blank placeholder
-                            result.push('random'); // append 'random' selection                            
-                            result.sort(); // sort alphabetically
-                            $.each(result, (index, item) => {
-                                $('<option></option>').val(item).html(item).appendTo(
-                                    this);
-                            })
-                        },
-                    })
-                },
-                getJoke: function (category) {
-                    let url = 'https://api.chucknorris.io/jokes/random';
-                    if (category !== undefined && category !== 'random') {
-                        url = url + '?category=' + category;
-                    }
-                    $.ajax(url, {
-                        context: this,
-                        method: "GET",
-                        beforeSend: function () {
-                            this.html('Loading...');
-                        },
-                        success: function (result) {
-                            this.html('<strong>' + result['value'] + '</strong>');
-                        },
-                        error: function (err) {
-                            let e =
-                                '<div style="background-color:red;"><strong> Something went wrong! Chuck Norris is not pleased..' + 
-                                'We encountered the following error:<p>' +
-                                err.error + '</p></strong></div>'
-                            this.html(e);
-                        }
-                    });
-                    return this;
+        $.fn.extend({
+            getCategories: function () {
+                return $.ajax('https://api.chucknorris.io/jokes/categories', {
+                    method: 'GET',
+                    success: (result) => {
+                        // add blank placeholder
+                        $('<option></option>') .val(undefined).html("-").appendTo(this); 
+                        // append 'random' selection  
+                        result.push('random');        
+                        // sort alphabetically                   
+                        result.sort(); 
+                        $.each(result, (index, item) => {
+                            $('<option></option>').val(item).html(item).appendTo(this);
+                        })
+                    },
+                });
+            },
+            getJoke: function (category) {
+                let url = 'https://api.chucknorris.io/jokes/random';
+                if (category !== undefined && category !== 'random') {
+                    url = url + '?category=' + category;
                 }
-            });
+                $.ajax(url, {
+                    context: this,
+                    method: "GET",
+                    beforeSend: function () {
+                        this.html('Loading...');
+                    },
+                    success: function (result) {
+                        this.html('<strong>' + result['value'] + '</strong>');
+                    },
+                    error: function (err) {
+                        let e =
+                            '<div style="background-color:red;"><strong> Something went wrong! Chuck Norris is not pleased..' +
+                            'We encountered the following error:<p>' +
+                            err.error + '</p></strong></div>'
+                        this.html(e);
+                    }
+                });
+                return this;
+            }
+        });
 
-            $('.jokeselectpicker').attr('disabled', true);
-            $('.jokeselectpicker').selectpicker({
-                size: 10,
-                noneSelectedText: "Loading...",
-            });
-            $('.jokeselectpicker').getCategories().then(function () {
-                $('.jokeselectpicker').selectpicker('refresh').removeAttr('disabled');
-            });
+        $('.jokeselectpicker').prop('disabled', true);
+        $('.jokeselectpicker').selectpicker({
+            size: 10,
+            noneSelectedText: "Loading...",
+        });
 
-            $('#get-joke').on('click', function () {
-                let selectedCategory = $('#category-dropdown').val();
-                $('#joke-result').getJoke(selectedCategory);
-            });
+        $('.jokeselectpicker').getCategories().then(() => {
+            $('.jokeselectpicker').prop('disabled', false);
+            $('.jokeselectpicker').selectpicker('refresh');
+        });
 
+        $('#get-joke').on('click', function () {
+            let selectedCategory = $('#category-dropdown').val();
+            $('#joke-result').getJoke(selectedCategory);
         });
     </script>
     <style>
