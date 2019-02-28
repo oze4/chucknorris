@@ -35,7 +35,7 @@
                     <div class='col-md-12'>
                         <label for="category_dropdown">Select Category</label>
                         <div>
-                            <select class='my-selectpicker' name="category_dropdown" id="category-dropdown">
+                            <select class='jokeselectpicker' name="category_dropdown" id="category-dropdown">
                             </select>
                         </div>
                     </div>
@@ -57,24 +57,19 @@
     <script type='text/javascript'>
         $(document).ready(function () {
             $.fn.extend({
-                getCategories: function () {
-                    $.ajax('https://api.chucknorris.io/jokes/categories', {
+                getCategories: function (callback) {
+                    return $.ajax('https://api.chucknorris.io/jokes/categories', {
                         method: 'GET',
-                        beforeSend: () => {
-                            $(this).attr('disabled');
-                        },
                         success: (result) => {
-                            $('<option></option>').val("-").html("-").appendTo(this); // add blank placeholder
+                            $('<option></option>').val(undefined).html("-").appendTo(this); // add blank placeholder
                             result.push('random'); // append 'random' selection                            
                             result.sort(); // sort alphabetically
                             $.each(result, (index, item) => {
-                                $('<option></option>').val(item).html(item).appendTo(this);
-                            })                            
-                            $(this).removeAttr('disabled');
-                            $(this).selectpicker('refresh');
-                        },                        
-                    });
-                    return this;
+                                $('<option></option>').val(item).html(item).appendTo(
+                                    this);
+                            })
+                        },
+                    })
                 },
                 getJoke: function (category) {
                     let url = 'https://api.chucknorris.io/jokes/random';
@@ -92,7 +87,8 @@
                         },
                         error: function (err) {
                             let e =
-                                '<div style="background-color:red;"><strong> Something went wrong! Chuck Norris is not pleased.. We encountered the following error:<p>' +
+                                '<div style="background-color:red;"><strong> Something went wrong! Chuck Norris is not pleased..' + 
+                                'We encountered the following error:<p>' +
                                 err.error + '</p></strong></div>'
                             this.html(e);
                         }
@@ -101,25 +97,26 @@
                 }
             });
 
-            $('.my-selectpicker#category-dropdown').selectpicker({
+            $('.jokeselectpicker').attr('disabled', true);
+            $('.jokeselectpicker').selectpicker({
                 size: 10,
                 noneSelectedText: "Loading...",
             });
-            $('.my-selectpicker#category-dropdown').getCategories();
+            $('.jokeselectpicker').getCategories().then(function () {
+                $('.jokeselectpicker').selectpicker('refresh').removeAttr('disabled');
+            });
 
             $('#get-joke').on('click', function () {
                 let selectedCategory = $('#category-dropdown').val();
                 $('#joke-result').getJoke(selectedCategory);
             });
+
         });
     </script>
     <style>
-        /** 
-         * for future use
         button[disabled] {
             cursor: not-allowed;
         }
-        **/
 
         .card-top-row {
             margin-bottom: 10px;
