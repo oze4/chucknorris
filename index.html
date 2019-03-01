@@ -53,15 +53,7 @@
         </div>
 
 
-        <script src='./chuckQuery.js' type='text/javascript'>
-            $('#category-dropdown').getCategories('#get-joke');
-
-            $('#get-joke').click(() => {
-                let s = $('#category-dropdown').val(); // selected category
-                if (s === '') $('#category-dropdown').val('random'); // means they clicked 'get joke' when '-' was selected
-                $('#joke-result').getJoke(s);
-            });
-        </script>
+        <script src='./chuckQuery.js' type='text/javascript'></script>
 </body>
 
 </html>
